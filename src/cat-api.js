@@ -1,7 +1,8 @@
 import Notiflix from 'notiflix';
 import axios from 'axios';
 
-const api_key = '';
+const api_key =
+  'live_0w7ZrKBD6fKc50M4ptOmi3TdDtXGyczZRpLqygeOLtmb0vzvwDSj0pjMabDdD6yD';
 axos.defaults.headers.common['x-api-key'] = api_key;
 const url = 'https://api.thecatapi.com/v1';
 

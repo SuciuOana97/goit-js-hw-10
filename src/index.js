@@ -1,64 +1,53 @@
-import SlimSelect from 'slim-select';
-import Notiflix from 'notiflix';
-import { fetchBreeds, fetchCatByBreed } from './cat-api.js';
+import { fetchBreeds, fetchCatByBreed } from './cat-api';
+import SlimSelect from 'Slimselect';
+import 'slim-select/dist/slimselect.css';
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
-const selectCat = document.querySelector('.breed-select');
-const loading = document.querySelector('.loader');
+const breedSelect = document.querySelector('.breed-select');
 const catInfo = document.querySelector('.cat-info');
+const loaderElement = document.querySelector('.loader');
+const errorElement = document.querySelector('.error');
 
-loading.style.display = 'none';
-catInfo.style.display = 'none';
+loaderElement.style.display = 'none';
+errorElement.style.display = 'none';
 
-const select = () => {
-  loading.style.display = 'block';
-  fetchBreeds()
-    .then(breeds => {
-      const options = breeds.map(breed => ({
-        text: breed.name,
-        value: breed.id,
-      }));
-      new SlimSelect({
-        select: '#breed-select',
-        data: options,
-      });
-    })
-    .catch(error => {
-      Notiflix.Notify.failure('Action Failed');
-      console.error('Action Failed', error);
-    })
-    .finally(() => {
-      loading.style.display = 'none';
+fetchBreeds()
+  .then(breeds => {
+    const fragmentElement = document.createDocumentFragment();
+    breeds.forEach(breed => {
+      const optionElement = document.createElement('option');
+      optionElement.textContent = breed.name;
+      optionElement.value = breed.id;
+      fragmentElement.append(optionElement);
     });
-};
 
-const showCats = breedId => {
-  loading.style.display = 'block';
-  Promise.all([fetchBreeds(), fetchCatByBreed(breedId)])
-    .then(([breeds, catData]) => {
-      const selectedBreed = breeds.find(breed => breed.id === breedId);
-      const catImage = catData[0].url;
-      catInfo.innerHTML = `
-        <h2>${selectedBreed.name}</h2>
-        <p><strong>Description:</strong> ${selectedBreed.description}</p>
-        <img src="${catImage}" alt="Cat" />
+    breedSelect.append(fragmentElement);
+    new SlimSelect({
+      select: breedSelect,
+    });
+  })
+  .catch(error => {
+    loaderElement.style.display = 'none';
+    Notify.failure(errorElement.textContent, error);
+    errorElement.style.display = 'block';
+  });
+
+breedSelect.addEventListener('change', function () {
+  const breedId = breedSelect.value;
+  loaderElement.style.display = 'block';
+  catInfo.style.display = 'none';
+  fetchCatByBreed(breedId)
+    .then(catData => {
+      loaderElement.style.display = 'none';
+      catInfo.style.display = 'flex';
+      catInfo.innerHTML = `<img class="catImage" src=${catData[0].url}  width="300px" alt="Image of a ${catData[0].breeds[0].name} cat ">
+      <h1 class="catBreed">${catData[0].breeds[0].name}  </h1>
+      <p class="catDescription">${catData[0].breeds[0].description}  </p>
+      <p class="catTemperament">Temperament: ${catData[0].breeds[0].temperament}  </p>
       `;
-      catInfo.style.display = 'block';
     })
     .catch(error => {
-      Notiflix.Notify.failure('Action Failed');
-      console.error('Action Failed', error);
-    })
-    .finally(() => {
-      loading.style.display = 'none';
+      loaderElement.style.display = 'none';
+      Notify.failure(errorElement.textContent, error);
     });
-};
-
-selectCat.addEventListener('change', event => {
-  const selectedBreedId = event.target.value;
-  showCats(selectedBreedId);
 });
-
-window.addEventListener('DOMContentLoaded', handler);
-function handler() {
-  select();
-}

@@ -9,13 +9,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SuciuOana97/goit-js-hw-09.gi"
+    "url": "git+https://github.com/SuciuOana97/goit-js-hw-10.git"
   },
   "keywords": [],
   "author": "Alexander Repeta <alexander.repeta@gmail.com>",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/SuciuOana97/goit-js-hw-10/issue"
+    "url": "https://github.com/SuciuOana97/goit-js-hw-10"
   },
   "dependencies": {
     "modern-normalize": "^1.1.0",
